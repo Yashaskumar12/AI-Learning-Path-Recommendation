@@ -21,10 +21,19 @@ This system provides personalized learning paths using roadmap-based course stru
 
 ```mermaid
 graph TD
-    Client[Frontend (React + Vite)] -->|REST API| API[Backend API (FastAPI)]
-    API -->|Read/Write| DB[(SQLite Database)]
-    DB -->|Seed Data| RoadmapData[Roadmap.sh Extracted Data]
-    API -->|Analytics Events| DB
+
+Client[Frontend (React + Vite)]
+API[FastAPI Backend]
+DB[(SQLite Database)]
+RoadmapData[Roadmap.sh Dataset]
+Analytics[Analytics & Event Pipeline]
+
+Client -->|HTTP Requests| API
+API -->|Query Courses, Skills, Progress| DB
+RoadmapData -->|Initial Course Extraction| DB
+Client -->|User Events| API
+API -->|Store Analytics Events| Analytics
+Analytics -->|Update Trust Score & Progress| DB
 ```
 
 - **Frontend**: Handles the user interface, routing, and visualization of roadmaps and dashboards.
