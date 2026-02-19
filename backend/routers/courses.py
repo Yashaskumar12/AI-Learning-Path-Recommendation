@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from db.database import get_db
 from models.course import Course
+from models.course_prerequisite import CoursePrerequisite
 
 router = APIRouter()
 
@@ -38,3 +39,29 @@ def get_course(course_id: str, db: Session = Depends(get_db)):
         "difficulty_level": course.difficulty_level,
         "description": course.description,
     }
+
+
+@router.get("/{course_id}/roadmap")
+def get_course_roadmap(course_id: str, db: Session = Depends(get_db)):
+    prereqs = db.query(CoursePrerequisite).filter(
+        CoursePrerequisite.course_id == course_id
+    ).all()
+
+    prerequisite_ids = [p.prerequisite_id for p in prereqs]
+
+    if not prerequisite_ids:
+        return []
+
+    courses = db.query(Course).filter(
+        Course.id.in_(prerequisite_ids)
+    ).all()
+
+    return [
+        {
+            "id": c.id,
+            "title": c.title,
+            "difficulty_level": c.difficulty_level,
+            "roadmap_id": c.roadmap_id
+        }
+        for c in courses
+    ]
