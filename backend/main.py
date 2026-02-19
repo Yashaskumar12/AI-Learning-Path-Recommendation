@@ -6,6 +6,12 @@ from routers.recommend import router as recommend_router
 from routers.users import router as users_router
 from routers import auth
 from routers import courses
+from routers import courses
+from routers import learning_path
+from routers import courses
+from routers import learning_path
+from routers import roadmaps
+from routers import progress
 
 app = FastAPI(title="AI Learning Path Recommendation System")
 
@@ -22,6 +28,13 @@ app.include_router(events_router, prefix="/events", tags=["events"])
 app.include_router(users_router, prefix="/users", tags=["users"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(courses.router, prefix="/courses", tags=["courses"])
+app.include_router(
+    learning_path.router,
+    prefix="/learning-path",
+    tags=["learning-path"]
+)
+app.include_router(roadmaps.router, prefix="/roadmaps", tags=["roadmaps"])
+app.include_router(progress.router, prefix="/progress", tags=["progress"])
 
 
 @app.get("/")

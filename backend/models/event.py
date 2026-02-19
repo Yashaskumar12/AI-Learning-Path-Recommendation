@@ -13,6 +13,7 @@ class Event(Base):
     user_id = Column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     event_type = Column(String, nullable=False, index=True)
     course_id = Column(String, nullable=True, index=True)
+    roadmap_id = Column(String, nullable=True, index=True)
     payload = Column(JSON().with_variant(Text(), "sqlite"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 

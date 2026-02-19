@@ -15,6 +15,7 @@ class UserSkill(Base):
     skill_name = Column(String, nullable=False, index=True)
     proficiency_level = Column(Float, default=0.0, nullable=False)
     elo_rating = Column(Float, default=1000.0, nullable=False)
+    trust_score = Column(Float, default=0.0, nullable=False)
     last_updated = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     user = relationship("User", back_populates="user_skills")

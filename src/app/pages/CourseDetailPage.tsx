@@ -12,8 +12,8 @@ type Course = {
 export default function CourseDetailPage() {
   const { courseId } = useParams();
   const [course, setCourse] = useState<Course | null>(null);
-  const [roadmap, setRoadmap] = useState<any[]>([]);
-  const [roadmapLoading, setRoadmapLoading] = useState(true);
+  const [learningPath, setLearningPath] = useState<any[]>([]);
+  const [pathLoading, setPathLoading] = useState(true);
 
   useEffect(() => {
     if (!courseId) return;
@@ -23,19 +23,15 @@ export default function CourseDetailPage() {
       .then(setCourse)
       .catch(() => setCourse(null));
 
-    const fetchRoadmap = async () => {
-      try {
-        const res = await fetch(`http://localhost:8000/courses/${courseId}/roadmap`);
-        if (!res.ok) throw new Error("Failed");
-        const data = await res.json();
-        setRoadmap(Array.isArray(data) ? data : []);
-      } catch {
-        setRoadmap([]);
-      } finally {
-        setRoadmapLoading(false);
-      }
-    };
-    fetchRoadmap();
+    const userId = localStorage.getItem("user_id");
+
+    fetch(`http://localhost:8000/learning-path/${userId}/${courseId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setLearningPath(data.path || []);
+        setPathLoading(false);
+      })
+      .catch(() => setPathLoading(false));
   }, [courseId]);
 
   if (!course) {
@@ -51,31 +47,38 @@ export default function CourseDetailPage() {
 
       <div>
         <h2 className="text-xl font-semibold mt-8 mb-4">Learning Roadmap</h2>
-        {roadmapLoading ? (
-          <div>Loading roadmap...</div>
+        {pathLoading ? (
+          <div>Loading learning path...</div>
         ) : (
-          Object.entries(
-            Array.isArray(roadmap)
-              ? roadmap.reduce((acc: any, item: any) => {
-                const level = item.difficulty_level ?? 0;
-                if (!acc[level]) acc[level] = [];
-                acc[level].push(item);
-                return acc;
-              }, {})
-              : {}
-          ).map(([difficultyLevel, items]) => (
-            <div key={difficultyLevel} className="mb-4">
-              <h3 className="font-medium mb-2">Difficulty {difficultyLevel}</h3>
-              {(items as any[]).map((item: any) => (
-                <div key={item.id} className="border rounded p-4 mb-3">
-                  <h3 className="font-medium">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Difficulty: {item.difficulty_level}
-                  </p>
+          <div className="space-y-4">
+            {learningPath.map((item: any) => {
+              const status = item.status || "locked";
+              let statusClasses = "border-gray-500/50 bg-gray-50/5 text-muted-foreground"; // locked
+
+              if (status === "completed") {
+                statusClasses = "border-green-500/50 bg-green-500/10";
+              } else if (status === "ready") {
+                statusClasses = "border-blue-500/50 bg-blue-500/10";
+              }
+
+              return (
+                <div
+                  key={item.id}
+                  className={`border rounded p-4 flex justify-between items-center ${statusClasses}`}
+                >
+                  <div>
+                    <h3 className="font-medium">{item.title}</h3>
+                    <p className="text-sm opacity-80">
+                      Difficulty: {item.difficulty}
+                    </p>
+                  </div>
+                  <div className="text-xs uppercase font-medium border px-2 py-1 rounded">
+                    {status}
+                  </div>
                 </div>
-              ))}
-            </div>
-          ))
+              );
+            })}
+          </div>
         )}
       </div>
 

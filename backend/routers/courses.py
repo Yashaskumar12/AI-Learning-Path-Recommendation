@@ -11,9 +11,15 @@ router = APIRouter()
 @router.get("")
 def list_courses(
     limit: int = Query(default=100, ge=1),
+    roadmap_id: str | None = Query(default=None),
     db: Session = Depends(get_db),
 ) -> list[dict[str, str | int | None]]:
-    courses = db.query(Course).limit(limit).all()
+    query = db.query(Course)
+    
+    if roadmap_id:
+        query = query.filter(Course.roadmap_id == roadmap_id)
+    
+    courses = query.order_by(Course.difficulty_level).limit(limit).all()
     return [
         {
             "id": course.id,
