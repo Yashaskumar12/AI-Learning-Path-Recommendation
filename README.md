@@ -22,7 +22,7 @@ This system provides personalized learning paths using roadmap-based course stru
 ```mermaid
 graph TD
 
-Client[Frontend (React + Vite)]
+Client[Frontend - React + Vite]
 API[FastAPI Backend]
 DB[(SQLite Database)]
 RoadmapData[Roadmap.sh Dataset]
