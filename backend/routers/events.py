@@ -4,19 +4,20 @@ from sqlalchemy.orm import Session
 
 from db.database import get_db
 from models import Event, UserSkill
+from models.user import User
+from core.security import get_current_user
 
 router = APIRouter()
 
 
 class EventPayload(BaseModel):
-    user_id: str
     event_type: str
     course_id: str
     payload: dict | None = None
 
 
 @router.post("")
-def create_event(payload: EventPayload, db: Session = Depends(get_db)) -> dict[str, str]:
+def create_event(payload: EventPayload, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> dict[str, str]:
     roadmap_id = None
     if payload.event_type == "course_completed":
         if not payload.course_id or ":" not in payload.course_id:
@@ -29,7 +30,7 @@ def create_event(payload: EventPayload, db: Session = Depends(get_db)) -> dict[s
         roadmap_id = payload.course_id.split(":")[0]
 
     event = Event(
-        user_id=payload.user_id,
+        user_id=str(current_user.id),
         event_type=payload.event_type,
         course_id=payload.course_id,
         roadmap_id=roadmap_id,
@@ -42,7 +43,7 @@ def create_event(payload: EventPayload, db: Session = Depends(get_db)) -> dict[s
         user_skill = (
             db.query(UserSkill)
             .filter(
-                UserSkill.user_id == payload.user_id, UserSkill.skill_name == roadmap_id
+                UserSkill.user_id == str(current_user.id), UserSkill.skill_name == roadmap_id
             )
             .first()
         )
@@ -52,7 +53,7 @@ def create_event(payload: EventPayload, db: Session = Depends(get_db)) -> dict[s
             user_skill.proficiency_level = min(user_skill.proficiency_level + 0.05, 1.0)
         else:
             new_skill = UserSkill(
-                user_id=payload.user_id,
+                user_id=str(current_user.id),
                 skill_name=roadmap_id,
                 trust_score=850,
                 proficiency_level=0.1,

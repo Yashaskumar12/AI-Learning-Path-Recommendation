@@ -4,7 +4,9 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from models.course import Course
 from models.course_prerequisite import CoursePrerequisite
+from models.user import User
 from models.user_skill import UserSkill
+from core.security import get_current_user
 
 router = APIRouter()
 
@@ -54,8 +56,9 @@ def get_user_elo(user_id: str, roadmap_id: str, db: Session) -> float:
     return 800.0  # default starting ELO
 
 
-@router.get("/{user_id}/{course_id}")
-def get_learning_path(user_id: str, course_id: str, db: Session = Depends(get_db)):
+@router.get("/{course_id}")
+def get_learning_path(course_id: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    user_id = str(current_user.id)
     target = db.query(Course).filter(Course.id == course_id).first()
 
     if not target:

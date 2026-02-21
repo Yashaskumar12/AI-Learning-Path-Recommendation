@@ -16,6 +16,11 @@ class User(Base):
     engagement_score = Column(Float, default=0.0, nullable=False)
     global_elo_rating = Column(Float, default=1000.0, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    
+    github_id = Column(String, unique=True, nullable=True, index=True)
+    github_username = Column(String, nullable=True)
+    github_access_token = Column(String, nullable=True)
+    github_connected_at = Column(DateTime, nullable=True)
 
     user_skills = relationship("UserSkill", back_populates="user", cascade="all, delete-orphan")
     events = relationship("Event", back_populates="user", cascade="all, delete-orphan")

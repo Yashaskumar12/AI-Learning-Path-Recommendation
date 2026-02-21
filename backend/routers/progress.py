@@ -5,13 +5,16 @@ from sqlalchemy import func
 from db.database import get_db
 from models.course import Course
 from models.event import Event
+from models.user import User
 from models.user_skill import UserSkill
+from core.security import get_current_user
 
 router = APIRouter()
 
 
-@router.get("/{user_id}/{roadmap_id}")
-def get_progress(user_id: str, roadmap_id: str, db: Session = Depends(get_db)):
+@router.get("/{roadmap_id}")
+def get_progress(roadmap_id: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    user_id = str(current_user.id)
     # total courses in roadmap
     total_courses = (
         db.query(func.count(Course.id))

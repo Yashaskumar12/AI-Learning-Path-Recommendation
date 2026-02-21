@@ -6,12 +6,15 @@ from db.database import get_db
 from models.user_skill import UserSkill
 from models.course import Course
 from models.event import Event
+from models.user import User
+from core.security import get_current_user
 
 router = APIRouter()
 
 
-@router.get("/{user_id}/skills")
-def get_user_skills(user_id: str, db: Session = Depends(get_db)):
+@router.get("/skills")
+def get_user_skills(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    user_id = str(current_user.id)
     # Query all skills for the user
     skills = db.query(UserSkill).filter(UserSkill.user_id == user_id).all()
 
