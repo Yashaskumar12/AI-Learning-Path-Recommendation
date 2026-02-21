@@ -33,7 +33,7 @@ def github_login(current_user: User = Depends(get_current_user)):
         f"scope=read:user repo&"
         f"state={state}"
     )
-    return RedirectResponse(url=github_auth_url)
+    return {"url": github_auth_url}
 
 @router.get("/callback")
 async def github_callback(code: str, state: str, db: Session = Depends(get_db)):
@@ -95,7 +95,8 @@ async def github_callback(code: str, state: str, db: Session = Depends(get_db)):
     from services.github_skill_extractor import extract_and_store_github_skills
     await extract_and_store_github_skills(user, db)
 
-    return {"status": "success", "message": "GitHub account successfully linked"}
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5174")
+    return RedirectResponse(url=f"{FRONTEND_URL}/dashboard")
 
 @router.get("/status")
 def github_status(current_user: User = Depends(get_current_user)):

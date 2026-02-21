@@ -1,26 +1,28 @@
 import React, { FormEvent, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { signup } from "../services/auth";
+import { Link } from "react-router-dom";
+import { signup } from "../../services/auth";
 
 export function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setLoading(true);
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log("Submitting signup");
+
     setError(null);
+    setLoading(true);
 
     try {
       const data = await signup(email, password);
-      localStorage.setItem("user_id", data.user_id);
-      navigate("/");
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Signup failed";
-      setError(message);
+      console.log("Response:", data);
+
+      window.location.href = "/dashboard";
+
+    } catch (err: any) {
+      setError(err.message || "Signup failed");
     } finally {
       setLoading(false);
     }

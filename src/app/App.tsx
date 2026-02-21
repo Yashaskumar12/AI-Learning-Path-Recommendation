@@ -12,9 +12,9 @@ import DashboardPage from './pages/DashboardPage';
 type Page = 'catalog' | 'dashboard' | 'roadmap' | 'topic-detail' | 'profile';
 
 function ProtectedRoute({ children }: { children: React.ReactElement }) {
-  const userId = localStorage.getItem('user_id');
+  const token = localStorage.getItem('access_token');
 
-  if (!userId) {
+  if (!token) {
     return <Navigate to="/login" replace />;
   }
 

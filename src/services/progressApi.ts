@@ -9,9 +9,13 @@ export interface Progress {
 
 const BACKEND_URL = "http://localhost:8000";
 
-export async function getProgress(userId: string, roadmapId: string): Promise<Progress | null> {
+export async function getProgress(roadmapId: string): Promise<Progress | null> {
     try {
-        const res = await fetch(`${BACKEND_URL}/progress/${userId}/${roadmapId}`);
+        const res = await fetch(`${BACKEND_URL}/progress/${roadmapId}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("access_token")}`
+            }
+        });
         if (!res.ok) return null;
 
         return await res.json();

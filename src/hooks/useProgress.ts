@@ -8,12 +8,12 @@ export function useProgress(userId: string, roadmapId: string) {
 
     useEffect(() => {
         async function load() {
-            const data = await getProgress(userId, roadmapId);
+            const data = await getProgress(roadmapId);
             setProgress(data);
             setLoading(false);
         }
 
-        if (userId && roadmapId) load();
+        if (roadmapId) load();
     }, [userId, roadmapId]);
 
     return { progress, loading };

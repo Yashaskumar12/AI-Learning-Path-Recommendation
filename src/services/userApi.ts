@@ -1,18 +1,21 @@
 const BACKEND_URL = "http://localhost:8000";
 
-export interface SkillProfile {
-    roadmap_id: string;
-    trust_score: number;
-    proficiency_level: number;
-    completed_courses: number;
-    total_courses: number;
-    progress_percent: number;
-    last_updated: string;
-}
+export async function getUserSkills() {
+    console.log("Token:", localStorage.getItem("access_token"));
 
-export async function getUserSkills(userId: string): Promise<SkillProfile[]> {
-    const res = await fetch(`${BACKEND_URL}/users/${userId}/skills`);
-    if (!res.ok) throw new Error("Failed to fetch skills");
-    const data = await res.json();
-    return data.skills;
+    const response = await fetch(`${BACKEND_URL}/users/me/skills`, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            "Content-Type": "application/json"
+        }
+    });
+
+    console.log("Response status:", response.status);
+
+    const text = await response.text();
+    console.log("Response body:", text);
+
+    if (!response.ok) throw new Error(text);
+
+    return JSON.parse(text);
 }

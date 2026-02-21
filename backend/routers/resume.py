@@ -19,10 +19,12 @@ async def upload_resume(
     current_user = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    print(f"\n[ResumeAPI] Received Resume upload request from User: {current_user.id}")
     file_path = f"{UPLOAD_DIR}/{current_user.id}_{file.filename}"
 
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
+        print(f"[ResumeAPI] File successfully saved to disk: {file_path}")
 
     ingest_resume(file_path, str(current_user.id), db)
 

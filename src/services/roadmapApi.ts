@@ -8,7 +8,11 @@ const BACKEND_URL = "http://localhost:8000";
 
 export async function getRoadmaps(): Promise<Roadmap[]> {
     try {
-        const res = await fetch(`${BACKEND_URL}/roadmaps`);
+        const res = await fetch(`${BACKEND_URL}/roadmaps`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("access_token")}`
+            }
+        });
         if (!res.ok) throw new Error("Failed to fetch roadmaps");
         return await res.json();
     } catch (err) {
